@@ -39,7 +39,7 @@ interface EditPanelProps {
 const getInitialContent = (type: BlockType) => {
   if (type === 'text') return 'Text Block';
   if (type === 'block') return 'Block';
-  return "I'm a note\n\nDouble click to edit me. Guide";
+  return "I&apos;m a note\n\nDouble click to edit me. Guide";
 };
 
 const getInitialColor = (type: BlockType) => {
@@ -69,13 +69,20 @@ declare global {
 }
 
 // Edit Panel Component
+// Edit Panel Component
 const EditPanel = ({ type, canvasId, blockId, item, onUpdate, onClose }: EditPanelProps) => {
-  const [content, setContent] = useState((item as any).content || '');
+  // Use correct typing instead of 'any'
+  const [content, setContent] = useState(
+    (item as BlockItem).content !== undefined ? (item as BlockItem).content : ''
+  );
   const [color, setColor] = useState(item.color || '#ffffff');
-  const [label, setLabel] = useState((item as any).label || '');
-  
+  const [label, setLabel] = useState(
+    (item as CanvasItem).label !== undefined ? (item as CanvasItem).label : ''
+  );
+
   const handleSave = () => {
-    const updates: any = { color };
+    // Use proper types for updates
+    const updates: Partial<BlockItem & CanvasItem> = { color };
     if (type === 'block') {
       updates.content = content;
     } else {
@@ -122,9 +129,9 @@ const EditPanel = ({ type, canvasId, blockId, item, onUpdate, onClose }: EditPan
               <button 
                 onClick={() => {
                   if (canvasId === 'main') {
-                    blockId && window.bringBlockToFront?.(blockId);
+                    if (blockId && window.bringBlockToFront) window.bringBlockToFront(blockId);
                   } else {
-                    blockId && window.bringToFront?.(canvasId, blockId);
+                    if (blockId && window.bringToFront) window.bringToFront(canvasId, blockId);
                   }
                 }}
                 className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex-1 font-bold"
@@ -134,9 +141,9 @@ const EditPanel = ({ type, canvasId, blockId, item, onUpdate, onClose }: EditPan
               <button 
                 onClick={() => {
                   if (canvasId === 'main') {
-                    blockId && window.sendBlockToBack?.(blockId);
+                    if (blockId && window.sendBlockToBack) window.sendBlockToBack(blockId);
                   } else {
-                    blockId && window.sendToBack?.(canvasId, blockId);
+                    if (blockId && window.sendToBack) window.sendToBack(canvasId, blockId);
                   }
                 }}
                 className="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 flex-1 font-bold"
@@ -177,6 +184,7 @@ const EditPanel = ({ type, canvasId, blockId, item, onUpdate, onClose }: EditPan
     </div>
   );
 };
+
 
 export default function Home() {
   const [canvases, setCanvases] = useState<CanvasItem[]>(initialCanvases);
@@ -628,8 +636,8 @@ export default function Home() {
           <div className="absolute inset-0 flex items-center justify-center text-gray-500">
             <div className="text-center">
               <p className="mb-4">Drag any item from the sidebar and drop here:</p>
-              <p>- 'Block' creates a new canvas</p>
-              <p>- 'Text' or 'Note' creates standalone items</p>
+              <p>- &apos;Block&apos; creates a new canvas</p>
+              <p>- &apos;Text&apos; or &apos;Note&apos; creates standalone items</p>
             </div>
           </div>
         )}
